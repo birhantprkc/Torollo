@@ -1,5 +1,5 @@
 import '../../i18n';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest';
 import { screen, fireEvent, waitFor, within } from '@testing-library/react';
 import ProjectsPage from './ProjectsPage';
 import { renderWithProviders as render } from '../../test-utils/renderWithProviders';
@@ -101,7 +101,7 @@ function buildFetchMock(handlers: {
     if (url.includes('/api/learning/progress/')) {
       return Promise.resolve(
         handlers.stepProgress?.() ??
-          jsonResponse(true, { steps: { 'reopen-the-store': { passed: true, attempts: 1, revealedHints: 0 } } })
+        jsonResponse(true, { steps: { 'reopen-the-store': { passed: true, attempts: 1, revealedHints: 0 } } })
       );
     }
     if (url.includes('/api/learning/progress')) {
@@ -112,7 +112,7 @@ function buildFetchMock(handlers: {
         const body = JSON.parse(String(init.body));
         return Promise.resolve(
           handlers.createProject?.(body) ??
-            jsonResponse(true, { id: 'new1', name: body.name, createdAt: '2026-07-22T10:00:00.000Z' })
+          jsonResponse(true, { id: 'new1', name: body.name, createdAt: '2026-07-22T10:00:00.000Z' })
         );
       }
       return Promise.resolve(handlers.projects?.() ?? jsonResponse(true, { projects }));
@@ -138,6 +138,11 @@ async function openBriefing(title: string) {
 }
 
 describe('ProjectsPage', () => {
+  beforeAll(async () => {
+    await import('./components/learning/LearningSection');
+    await import('./components/learning/detail/RoadmapDetailPage');
+  });
+
   beforeEach(() => {
     localStorage.clear();
   });
@@ -148,7 +153,7 @@ describe('ProjectsPage', () => {
 
   it('shows skeleton cards while projects are loading', async () => {
     // A projects request that never settles keeps the section in its loading state.
-    vi.stubGlobal('fetch', buildFetchMock({ projects: () => new Promise<Response>(() => {}) }));
+    vi.stubGlobal('fetch', buildFetchMock({ projects: () => new Promise<Response>(() => { }) }));
     render(<ProjectsPage onSelectProject={vi.fn()} />);
 
     const section = screen.getByLabelText('Loading projects');
@@ -167,7 +172,7 @@ describe('ProjectsPage', () => {
       },
     });
     vi.stubGlobal('fetch', fetchMock);
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
 
     render(<ProjectsPage onSelectProject={vi.fn()} />);
 

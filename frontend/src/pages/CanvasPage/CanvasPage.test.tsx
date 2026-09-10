@@ -1,5 +1,5 @@
 import '../../i18n';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest';
 import { screen, fireEvent, createEvent, waitFor, within, act } from '@testing-library/react';
 import CanvasPage from './CanvasPage';
 import { renderWithProviders as render } from '../../test-utils/renderWithProviders';
@@ -105,6 +105,11 @@ async function renderCanvasPage(fetchMock: ReturnType<typeof vi.fn>, props: Part
 }
 
 describe('CanvasPage', () => {
+  beforeAll(async () => {
+    await import('./components/CanvasModals');
+    await import('../../features/learning/components/LearningPanel');
+  });
+
   beforeEach(() => {
     localStorage.clear();
     // React Flow computes viewport/fitView and hit-testing off the pane element's
