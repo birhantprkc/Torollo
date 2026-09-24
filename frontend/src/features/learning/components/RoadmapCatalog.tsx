@@ -1,21 +1,18 @@
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useRoadmaps } from '../hooks/useRoadmaps';
+import type { useRoadmaps } from '../hooks/useRoadmaps';
 import { filterByUiLanguage } from '../roadmapLanguage';
 import DifficultyChip from './DifficultyChip';
 import type { RoadmapSummary } from '../../../shared/types/roadmap';
 
 interface RoadmapCatalogProps {
+  /** Catalogue state, owned and fetched by LearningPanel. */
+  roadmaps: ReturnType<typeof useRoadmaps>;
   onOpen: (summary: RoadmapSummary) => void;
 }
 
-export default function RoadmapCatalog({ onOpen }: RoadmapCatalogProps) {
+export default function RoadmapCatalog({ roadmaps, onOpen }: RoadmapCatalogProps) {
   const { t, i18n } = useTranslation();
-  const { summaries, loading, error, fetchRoadmaps } = useRoadmaps();
-
-  useEffect(() => {
-    fetchRoadmaps();
-  }, [fetchRoadmaps]);
+  const { summaries, loading, error, fetchRoadmaps } = roadmaps;
 
   // Re-evaluated on every render, so toggling the language in the topbar
   // re-filters the catalogue immediately.

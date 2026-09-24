@@ -226,7 +226,17 @@ export function useLearningPlayer({ projectId }: UseLearningPlayerOptions) {
     [progressUrl]
   );
 
+  // Invalidates any in-flight openRoadmap: its result will be dropped.
+  const cancelPendingOpen = useCallback(() => {
+    openSeqRef.current++;
+    setRoadmapLoading(false);
+  }, []);
+
+  // Unmount: a response landing after the panel is gone must be dropped.
+  useEffect(() => cancelPendingOpen, [cancelPendingOpen]);
+
   const closeRoadmap = useCallback(() => {
+    cancelPendingOpen();
     fireAbandon();
     setRoadmap(null);
     setRoadmapError(null);
@@ -239,7 +249,7 @@ export function useLearningPlayer({ projectId }: UseLearningPlayerOptions) {
     setResetError(null);
     setCompletionOpen(false);
     setRunTimes({});
-  }, [fireAbandon]);
+  }, [fireAbandon, cancelPendingOpen]);
 
   const goToStep = useCallback(
     (index: number) => {
@@ -380,6 +390,7 @@ export function useLearningPlayer({ projectId }: UseLearningPlayerOptions) {
     roadmapError,
     openRoadmap,
     closeRoadmap,
+    cancelPendingOpen,
     currentStepIndex,
     currentStep,
     goToStep,
